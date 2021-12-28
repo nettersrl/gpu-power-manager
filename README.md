@@ -29,3 +29,4 @@ Then run *npm i* on the project dir, *npm run compile* and finally:
 # SystemD service file
 If you want to run the tuner when the system boots up you should place this project in */opt/mining/power_manager*
 Then place the systemd service file in the system path you prefer and then *systemctl daemon-reload*
+In the systemd_services folder you will also find an *after-setup.service* that can be used as example to create a systemd service which should await for gpu-setup before starting up.

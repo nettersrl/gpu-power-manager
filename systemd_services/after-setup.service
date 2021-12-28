@@ -1,0 +1,13 @@
+[Unit]
+Description=Service that should run after the GPU setup
+After=multi-user.target network-online.target gpu-setup.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/opt/mining/ezil/ezil.sh
+User=root
+WorkingDirectory=/opt/mining/ezil
+
+[Install]
+WantedBy=multi-user.target
