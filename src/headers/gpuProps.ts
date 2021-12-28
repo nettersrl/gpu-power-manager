@@ -1,0 +1,17 @@
+export const AMD_MODELS_PROPS = {
+    AMD_VENDOR_ID: "1002",
+    GIGABYTE_RX_5700_XT_DEVICE_ID: "731f",
+    GIGABYTE_RX_5700_XT_SUBDEVICEVENDOR_ID: "14582313", // should be like vendor_id += device_id without the initial "0x"
+    ASROCK_RX_6800_XT_DEVICE_ID: "73bf",
+    ASROCK_RX_6800_XT_SUBDEVICEVENDOR_ID: "18495202",
+    SAPPHIRE_RX_6800_DEVICE_ID: "73bf",
+    SAPPHIRE_RX_6800_SUBDEVICEVENDOR_ID: "1da2e439"
+};
+
+export const NVIDIA_MODELS_PROPS = {
+    NVIDIA_VENDOR_ID: "10de",
+    ZOTAC_RTX_3070_DEVICE_ID: "2484",
+    ZOTAC_RTX_3070_SUBDEVICEVENDOR_ID: "162619da", // should be like vendor_id += device_id without the initial "0x"
+    MSI_RTX_2080_SUPER_DEVICE_ID: "1e81",
+    MSI_RTX_2080_SUPER_SUBDEVICEVENDOR_ID: "c7241462"
+};

@@ -1,0 +1,12 @@
+[Unit]
+Description=GPU setup
+After=multi-user.target
+
+[Service]
+Type=oneshot
+User=root
+ExecStart=/usr/bin/node dist/run.js
+WorkingDirectory=/opt/mining/power_manager
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,36 @@
+{
+    "nvidia": {
+        "ZOTAC_RTX_3070": {
+	    "fan_speed": 80,
+            "core_clock_offset": -200,
+            "ram_clock_offset": 1100,
+            "power_limit": 125
+        },
+	"MSI_RTX_2080_SUPER": {
+            "fan_speed": 80,
+            "core_clock_offset": -50,
+            "ram_clock_offset": 1000,
+            "power_limit": 175
+        }
+    },
+    "amd": {
+        "SAPPHIRE_RX_6800": {
+            "fan_speed": 70,
+            "core_clock_offset": -1000,
+            "ram_clock_offset": 62,
+            "power_limit": 130
+        },
+	 "ASROCK_RX_6800_XT": {
+            "fan_speed": 70,
+            "core_clock_offset": -1150,
+            "ram_clock_offset": 56,
+            "power_limit": 152
+        },
+	"GIGABYTE_RX_5700_XT": {
+            "fan_speed": 70,
+            "core_clock_offset": 0,
+            "ram_clock_offset": 0,
+            "power_limit": 140
+        }
+    }
+}
