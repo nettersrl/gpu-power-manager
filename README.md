@@ -1,6 +1,8 @@
 # gpu-power-manager
 A power tuning utility and a simple monitor to handle all the tuning stuff on your AMD or NVIDIA GPU over Linux.
 
+![Alt text](/gpu-monitor-screen.jpg?raw=true "GPU Monitor tool")
+
 # Supported plaforms
 Tested on Fedora 34/35 with amdgpu opensource drivers (we do not recommend to use AMDGPU-PRO drivers) and with the latest NVIDIA proprietary drivers.
 Please note that this software is meant for headless system, so there is no Xorg or Wayland session running on our host while we are using it.
