@@ -140,8 +140,8 @@ export async function setupAmdPowerSettings(settings: ISettingFile, models: stri
         debugLog("Found core clocks for AMD before applying: " + JSON.stringify(coreClocks, null, 4));
         debugLog("Found memory clocks for AMD before applying: " + JSON.stringify(memoryClocks, null, 4));
 
-        const highestCoreFreq = _.cloneDeep(coreClocks[coreClocks.length - 1] || coreClocks[0]);
-        const highestMemFreq = _.cloneDeep(memoryClocks[coreClocks.length - 1] || memoryClocks[0]);
+        const highestCoreFreq = _.cloneDeep(coreClocks[coreClocks.length - 1]);
+        const highestMemFreq = _.cloneDeep(memoryClocks[coreClocks.length - 1]);
         const newCoreFreq = highestCoreFreq.frequency + settings.amd[amdgpus[i].netterDeviceName].core_clock_offset;
         const newMemFreq = highestMemFreq.frequency + settings.amd[amdgpus[i].netterDeviceName].ram_clock_offset;
         execSync(`echo "${highestCoreFreq.index}" > /sys/class/drm/card${amdgpus[i].gpuSysfsIndex}/device/pp_dpm_sclk`);
