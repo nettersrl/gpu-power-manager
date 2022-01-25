@@ -1,36 +1,106 @@
 {
     "nvidia": {
         "ZOTAC_RTX_3070": {
-	    "fan_speed": 80,
-            "core_clock_offset": -200,
-            "ram_clock_offset": 1100,
-            "power_limit": 125
+            "vendor_id": "10de",
+            "device_id": "2484",
+            "subsystem_vendor_id": "1626",
+            "subsystem_device_id": "19da",
+            "powerProfiles": {
+                "mining": {
+                    "fan_speed": 80,
+                    "core_clock_offset": -200,
+                    "ram_clock_offset": 1100,
+                    "power_limit": 125
+                },
+                "vgpu": {
+                    "fan_speed": 80,
+                    "core_clock_offset": 0,
+                    "ram_clock_offset": 0,
+                    "power_limit": 0
+                }
+            }
         },
-	"MSI_RTX_2080_SUPER": {
-            "fan_speed": 80,
-            "core_clock_offset": -50,
-            "ram_clock_offset": 1000,
-            "power_limit": 175
+        "MSI_RTX_2080_SUPER": {
+            "vendor_id": "10de",
+            "device_id": "1e81",
+            "subsystem_vendor_id": "c724",
+            "subsystem_device_id": "1462",
+            "powerProfiles": {
+                "mining": {
+                    "fan_speed": 80,
+                    "core_clock_offset": -50,
+                    "ram_clock_offset": 1000,
+                    "power_limit": 175
+                },
+                "vgpu": {
+                    "fan_speed": 80,
+                    "core_clock_offset": 0,
+                    "ram_clock_offset": 0,
+                    "power_limit": 0
+                }
+            }
         }
     },
     "amd": {
         "SAPPHIRE_RX_6800": {
-            "fan_speed": 70,
-            "core_clock_offset": -1000,
-            "ram_clock_offset": 62,
-            "power_limit": 130
+            "vendor_id": "1002",
+            "device_id": "73bf",
+            "subsystem_vendor_id": "1da2",
+            "subsystem_device_id": "e439",
+            "powerProfiles": {
+                "mining": {
+                    "fan_speed": 70,
+                    "core_clock_offset": -1000,
+                    "ram_clock_offset": 62,
+                    "power_limit": 130
+                },
+                "vgpu": {
+                    "fan_speed": 70,
+                    "core_clock_offset": 0,
+                    "ram_clock_offset": 0,
+                    "power_limit": 0
+                }
+            }
         },
-	 "ASROCK_RX_6800_XT": {
-            "fan_speed": 70,
-            "core_clock_offset": -1150,
-            "ram_clock_offset": 56,
-            "power_limit": 152
+        "ASROCK_RX_6800_XT": {
+            "vendor_id": "1002",
+            "device_id": "73bf",
+            "subsystem_vendor_id": "1849",
+            "subsystem_device_id": "5202",
+            "powerProfiles": {
+                "mining": {
+                    "fan_speed": 70,
+                    "core_clock_offset": -1150,
+                    "ram_clock_offset": 56,
+                    "power_limit": 152
+                },
+                "vgpu": {
+                    "fan_speed": 70,
+                    "core_clock_offset": 0,
+                    "ram_clock_offset": 0,
+                    "power_limit": 0
+                }
+            }
         },
-	"GIGABYTE_RX_5700_XT": {
-            "fan_speed": 70,
-            "core_clock_offset": 0,
-            "ram_clock_offset": 0,
-            "power_limit": 140
+        "GIGABYTE_RX_5700_XT": {
+            "vendor_id": "1002",
+            "device_id": "731f",
+            "subsystem_vendor_id": "1458",
+            "subsystem_device_id": "2313",
+            "powerProfiles": {
+                "mining": {
+                    "fan_speed": 70,
+                    "core_clock_offset": 0,
+                    "ram_clock_offset": 0,
+                    "power_limit": 140
+                },
+                "vgpu": {
+                    "fan_speed": 70,
+                    "core_clock_offset": 0,
+                    "ram_clock_offset": 0,
+                    "power_limit": 0
+                }
+            }
         }
     }
 }

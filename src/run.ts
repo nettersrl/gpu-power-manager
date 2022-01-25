@@ -1,15 +1,35 @@
-import { setupNvidiaPowerSettings } from './libs/nvidiaGpu';
+import commandLineArgs from 'command-line-args';
+import _ from 'lodash';
+import { GpuTunerStrategy } from './controllers/tuners/GpuTunerStrategy';
 import { openSettings } from './utils/settings';
-import { setupAmdPowerSettings } from './libs/amdGpu';
+
+const optionDefinitions = [
+    { name: 'profile', alias: 'p', type: String },
+    { name: 'brand', alias: 'b', type: String, multiple: true },
+    { name: 'model', alias: 'm', type: String, multiple: true }
+];
+
+const options = commandLineArgs(optionDefinitions);
 
 async function main() {
     const settings = openSettings();
-    if (settings.nvidia && Object.keys(settings.nvidia).length > 0 && process.env.NVIDIA !== "false") {
-	await setupNvidiaPowerSettings(settings, Object.keys(settings.nvidia));
+    if(!options["profile"]) {
+        throw new Error("Profile not passed. Use --profile parameter");
     }
-    if (settings.amd && Object.keys(settings.amd).length > 0 && process.env.AMD !== "false") {
-	await setupAmdPowerSettings(settings, Object.keys(settings.amd));
+    for (const brand of Object.keys(settings)) {
+        if (options["brand"] && !options["brand"].includes(brand)) {
+            continue;
+        }
+        if (Object.keys(settings[brand]).length > 0 && process.env[brand.toUpperCase()] !== "false") {
+            const instance = new GpuTunerStrategy().setStrategy(brand, settings[brand]);
+            instance.setPowerProfile(options.profile);
+            let modelsToApply = _.cloneDeep(Object.keys(settings[brand]));
+            if(options["model"] instanceof Array && options["model"].length > 0) {
+                modelsToApply = modelsToApply.filter(model => options["model"].includes(model));  
+            }
+            await instance.applyGpuPowerSettings(modelsToApply);
+        }
     }
 }
 
-main();
+main().catch(console.error);
