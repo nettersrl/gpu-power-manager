@@ -17,8 +17,11 @@ export function scanNvidiaDevices() {
         return parseFloat(value);
     }
 
-    const stdout = nvidiaSmi();
-    if (!stdout) {
+    let stdout: string;
+    
+    try {
+        stdout = nvidiaSmi();
+    } catch {
         return [];
     }
 
