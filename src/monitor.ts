@@ -206,7 +206,7 @@ async function printData(settings: ISettingFile, isFirstRun?: boolean) {
     console.clear();
     const dataToPrint = castAdapterSiData(result);
     const date = new Date();
-    const p = new Table({ title: `GPU stats (Last update at: ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()})` });
+    const p = new Table({ title: `GPU stats (Last update at: ${date.toTimeString().split(' ')[0]})` });
     for (const elmToPrint of dataToPrint) {
         const row = { color: "white" };
         const differences = elmToPrint.getDifferences();
