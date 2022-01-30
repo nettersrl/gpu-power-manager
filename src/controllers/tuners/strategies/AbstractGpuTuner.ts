@@ -2,7 +2,7 @@ import { existsSync, mkdir, mkdirSync, writeFileSync } from 'fs';
 import { GpuInfoObject } from '../../../interfaces/IGpuInfo';
 import { ISettingFileGpu } from '../../../interfaces/ISettingsFile';
 
-export const POWER_PROFILE_NOT_SET = "idle";
+export const POWER_PROFILE_NOT_SET = "stock";
 
 export abstract class AbstractGpuTuner {
 

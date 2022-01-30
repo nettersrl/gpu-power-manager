@@ -134,7 +134,7 @@ class GpuStatsArchiver {
         switch (this.powerProfile) {
             case "mining":
                 return this.currentRecord.getData().fanSpeed < 50 || this.currentRecord.getData().tempGpu > 70 || this.currentRecord.getData().tempMem > 85 || this.currentRecord.getData().powerDraw < (this.currentRecord.getData().powerLimit - 20);
-            case "idle":
+            case POWER_PROFILE_NOT_SET:
                 return ((this.currentRecord.getData().tempGpu > 50 || this.currentRecord.getData().tempMem > 50) && this.currentRecord.getData().fanSpeed < 40) ||
                     ((this.currentRecord.getData().tempGpu > 80 || this.currentRecord.getData().tempMem > 80) && this.currentRecord.getData().fanSpeed > 40);
         }

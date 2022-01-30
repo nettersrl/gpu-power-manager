@@ -1,9 +1,9 @@
 import { execSync, spawn } from "child_process";
 import { existsSync, readdirSync, readFileSync } from "fs";
-import * as si from 'systeminformation';
 import { GpuInfoObject } from "../../../interfaces/IGpuInfo";
 import { ISettingFileGpu } from "../../../interfaces/ISettingsFile";
 import { debugLog } from "../../../utils/log";
+import { scanNvidiaDevices } from "../../../utils/nvidiaSmi";
 import { killProcessAndWaitForEnd } from "../../../utils/processes";
 import { AbstractGpuTuner } from "./AbstractGpuTuner";
 
@@ -30,11 +30,11 @@ export class NvidiaGpuTuner extends AbstractGpuTuner {
     }
 
     public async getInstalledGpus(models: string[]): Promise<GpuInfoObject[]> {
-        const gr = await si.graphics();
+        const gr = scanNvidiaDevices();
         debugLog("[getInstalledNvidiaGpu]: systeminformation found this graphic cards: ");
         debugLog(gr);
         debugLog("----------------------------------------------------------------------");
-        const nvidiaCards = gr.controllers.reduce((acc, curr) => {
+        const nvidiaCards = gr.reduce((acc, curr) => {
             try {
                 const currentSubVendorId = curr.subDeviceId.indexOf("0x") === 0 ? curr.subDeviceId.toLowerCase().slice(2) : curr.subDeviceId.toLowerCase();
                 const listOfPciDevices = readdirSync("/sys/bus/pci/devices");
@@ -60,8 +60,8 @@ export class NvidiaGpuTuner extends AbstractGpuTuner {
                         this.gpusUserProfiles[gpuName].device_id === currentDeviceId
                     ) {
                         debugLog("ENTERED")
-                        curr.deviceId = this.gpusUserProfiles[gpuName].device_id;
-                        curr.vendorId = this.gpusUserProfiles[gpuName].vendor_id;
+                        curr["deviceId"] = this.gpusUserProfiles[gpuName].device_id;
+                        curr["vendorId"] = this.gpusUserProfiles[gpuName].vendor_id;
                         curr["netterDeviceName"] = gpuName;
                         curr["vendor"] = "nvidia";
                         acc.push(curr);

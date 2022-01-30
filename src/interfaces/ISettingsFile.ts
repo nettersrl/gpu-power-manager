@@ -11,7 +11,7 @@ export interface IGpuSettingProps {
     subsystem_vendor_id: string;
     subsystem_device_id: string;
     powerProfiles: {
-        [powerProfileName: string]: IPowerProfileProps; // powerProfileName can be "idle", "vgpu", "mining" or whatsoever
+        [powerProfileName: string]: IPowerProfileProps; // powerProfileName can be "stock", "vgpu", "mining" or whatsoever
     }
 };
 
