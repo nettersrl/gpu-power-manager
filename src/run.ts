@@ -20,7 +20,7 @@ async function main() {
         if (options["brand"] && !options["brand"].includes(brand)) {
             continue;
         }
-        if (Object.keys(settings[brand]).length > 0 && process.env[brand.toUpperCase()] !== "false") {
+        if (Object.keys(settings[brand]).length > 0) {
             const instance = new GpuTunerStrategy().setStrategy(brand, settings[brand]);
             instance.setPowerProfile(options.profile);
             let modelsToApply = _.cloneDeep(Object.keys(settings[brand]));

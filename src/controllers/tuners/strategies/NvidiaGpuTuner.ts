@@ -1,5 +1,5 @@
 import { execSync, spawn } from "child_process";
-import { existsSync, readdirSync } from "fs";
+import { existsSync, readdirSync, readFileSync } from "fs";
 import * as si from 'systeminformation';
 import { GpuInfoObject } from "../../../interfaces/IGpuInfo";
 import { ISettingFileGpu } from "../../../interfaces/ISettingsFile";
@@ -15,9 +15,6 @@ export class NvidiaGpuTuner extends AbstractGpuTuner {
 
     public constructor(nvidiaGpusUserProfiles: ISettingFileGpu) {
         super(nvidiaGpusUserProfiles);
-        this.xDisplayEnvVars = {
-            "DISPLAY": ":0.0"
-        }
     };
 
     private execSyncWithEnv(command: string) {
@@ -40,15 +37,29 @@ export class NvidiaGpuTuner extends AbstractGpuTuner {
         const nvidiaCards = gr.controllers.reduce((acc, curr) => {
             try {
                 const currentSubVendorId = curr.subDeviceId.indexOf("0x") === 0 ? curr.subDeviceId.toLowerCase().slice(2) : curr.subDeviceId.toLowerCase();
-                const currentVendorId = curr.vendorId.indexOf("0x") === 0 ? curr.vendorId.toLowerCase().slice(2) : curr.vendorId.toLowerCase();
-                const currentDeviceId = curr.deviceId.indexOf("0x") === 0 ? curr.deviceId.toLowerCase().slice(2) : curr.deviceId.toLowerCase();
+                const listOfPciDevices = readdirSync("/sys/bus/pci/devices");
+                const nameOfPciDeviceDir = listOfPciDevices.find(name => curr.pciBus.toLowerCase().includes(name));
+                const deviceIdFromSysFs = readFileSync(`/sys/bus/pci/devices/${nameOfPciDeviceDir}/device`).toString().trim();
+                const vendorIdFromSysFs = readFileSync(`/sys/bus/pci/devices/${nameOfPciDeviceDir}/vendor`).toString().trim();
+                const currentVendorId = vendorIdFromSysFs.indexOf("0x") === 0 ? vendorIdFromSysFs.toLowerCase().slice(2) : vendorIdFromSysFs.toLowerCase();
+                const currentDeviceId = deviceIdFromSysFs.indexOf("0x") === 0 ? deviceIdFromSysFs.toLowerCase().slice(2) : deviceIdFromSysFs.toLowerCase();
+                debugLog("currentVendorId " + currentVendorId)
+                debugLog("currentDeviceId " + currentDeviceId)
+
                 for (const gpuName in this.gpusUserProfiles) {
                     const subVendorDeviceId = this.gpusUserProfiles[gpuName].subsystem_vendor_id + this.gpusUserProfiles[gpuName].subsystem_device_id;
+                    debugLog("this.gpusUserProfiles[gpuName].vendor_id " + this.gpusUserProfiles[gpuName].vendor_id)
+                    debugLog("this.gpusUserProfiles[gpuName].device_id " + this.gpusUserProfiles[gpuName].device_id)
+                    debugLog("subVendorDeviceId " + subVendorDeviceId)
+                    debugLog("currentSubVendorId " + currentSubVendorId)
+                    debugLog("models " + models)
+                    debugLog("gpuName " + gpuName)
                     if (models.includes(gpuName) &&
                         subVendorDeviceId === currentSubVendorId &&
                         this.gpusUserProfiles[gpuName].vendor_id === currentVendorId &&
                         this.gpusUserProfiles[gpuName].device_id === currentDeviceId
                     ) {
+                        debugLog("ENTERED")
                         curr.deviceId = this.gpusUserProfiles[gpuName].device_id;
                         curr.vendorId = this.gpusUserProfiles[gpuName].vendor_id;
                         curr["netterDeviceName"] = gpuName;
@@ -67,8 +78,8 @@ export class NvidiaGpuTuner extends AbstractGpuTuner {
     }
 
 
-    public applyGpuPowerSettings(models: string[]): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
+    public applyGpuPowerSettingsStateless(models: string[]): Promise<string[]> {
+        return new Promise((resolve, reject) => {
             let started = false;
             let freeDisplayIndex: number = 1;
 
@@ -82,10 +93,14 @@ export class NvidiaGpuTuner extends AbstractGpuTuner {
                     return true;
                 }
             });
+            this.xDisplayEnvVars = {
+                DISPLAY: ":" + freeDisplayIndex + ".0"
+            };
 
-            const xinitproc = spawn("xinit -- :" + freeDisplayIndex);
+            const xinitproc = spawn("xinit", ["--", ":" + freeDisplayIndex]);
             const nvidiaSetup = async (data) => {
                 let error: Error;
+                const failedModels: string[] = [];
                 // enter only if xorg says it is started, avoid running this script twice
                 if (!started && data.toString().includes(`Using system config directory "/usr/share/X11/xorg.conf.d"`)) {
                     started = true;
@@ -96,7 +111,7 @@ export class NvidiaGpuTuner extends AbstractGpuTuner {
                         debugLog("[NvidiaSetup]: Installed nvidia cards detected: " + nvidiaGpus.length + ". Going to process them.");
 
                         for (let i = 0; i < nvidiaGpus.length; i++) {
-                            const powerProfileObject = this.gpusUserProfiles[nvidiaGpus[i].netterDeviceName].powerProfiles[this.powerProfile];
+                            const powerProfileObject = this.gpusUserProfiles[nvidiaGpus[i].netterDeviceName].powerProfiles[this.getPowerProfile()];
                             if (powerProfileObject) {
                                 this.execSyncWithEnv(`nvidia-smi -i ${i} -pl ${powerProfileObject.power_limit.toString()}`);
                                 this.execSyncWithEnv(`nvidia-settings -a "[gpu:${i}]/GpuPowerMizerMode=1"`);
@@ -105,7 +120,8 @@ export class NvidiaGpuTuner extends AbstractGpuTuner {
                                 this.execSyncWithEnv(`nvidia-settings -a "[gpu:${i}]/GPUGraphicsClockOffsetAllPerformanceLevels=${powerProfileObject.core_clock_offset.toString()}"`);
                                 this.execSyncWithEnv(`nvidia-settings -a "[gpu:${i}]/GPUMemoryTransferRateOffsetAllPerformanceLevels=${(powerProfileObject.ram_clock_offset * 2).toString()}"`);
                             } else {
-                                console.log(`Skipping cards with this device name: ${nvidiaGpus[i].netterDeviceName} since power profile: ${this.powerProfile} is not configured in settings.json`);
+                                console.log(`Skipping cards with this device name: ${nvidiaGpus[i].netterDeviceName} since power profile: ${this.getPowerProfile()} is not configured in settings.json`);
+                                failedModels.push(nvidiaGpus[i].netterDeviceName);
                             }
                         }
                     } catch (err) {
@@ -126,7 +142,7 @@ export class NvidiaGpuTuner extends AbstractGpuTuner {
                             await killProcessAndWaitForEnd(parseInt(row.trim().split(" ")[1]));
                         }
                     }
-                    error ? reject(error) : resolve();
+                    error ? reject(error) : resolve(failedModels);
                 }
             }
             xinitproc.stderr.on("data", async data => {

@@ -61,7 +61,8 @@ export class AmdGpuTuner extends AbstractGpuTuner {
                             currentPciLinkSpeed: pcilinkspeed,
                             currentPciLinkWidth: pcilinkwidth,
                             maxPciLinkSpeed: maxpcilinkspeed,
-                            maxPciLinkWidth: maxpcilinkwidth
+                            maxPciLinkWidth: maxpcilinkwidth,
+                            currentPowerProfile: null
                         };
                         acc.push(gpuObject);
                     }
@@ -76,11 +77,12 @@ export class AmdGpuTuner extends AbstractGpuTuner {
         return cards;
     }
 
-    async applyGpuPowerSettings(models: string[]) {
+    async applyGpuPowerSettingsStateless(models: string[]): Promise<string[]> { //returns models where couldn't get the target pwoer profile
         const amdgpus = await this.getInstalledGpus(models);
+        const failedModels: string[] = [];
         for (let i = 0; i < amdgpus.length; i++) {
             const hwmonDirName = readdirSync(`/sys/class/drm/card${amdgpus[i].gpuSysfsIndex}/device/hwmon`)[0];
-            const powerProfileObject = this.gpusUserProfiles[amdgpus[i].netterDeviceName].powerProfiles[this.powerProfile];
+            const powerProfileObject = this.gpusUserProfiles[amdgpus[i].netterDeviceName].powerProfiles[this.getPowerProfile()];
             if (powerProfileObject) {
                 // sets power cap
                 execSync(`echo ${powerProfileObject.power_limit * 1000000} > /sys/class/drm/card${amdgpus[i].gpuSysfsIndex}/device/hwmon/${hwmonDirName}/power1_cap`);
@@ -132,8 +134,10 @@ export class AmdGpuTuner extends AbstractGpuTuner {
                 execSync(`echo "m ${highestMemFreq.index} ${newMemFreq}" > /sys/class/drm/card${amdgpus[i].gpuSysfsIndex}/device/pp_od_clk_voltage`);
                 execSync(`echo "c" > /sys/class/drm/card${amdgpus[i].gpuSysfsIndex}/device/pp_od_clk_voltage`);
             } else {
-                console.log(`Skipping cards with this device name: ${amdgpus[i].netterDeviceName} since power profile: ${this.powerProfile} is not configured in settings.json`);
+                console.log(`Skipping cards with this device name: ${amdgpus[i].netterDeviceName} since power profile: ${this.getPowerProfile()} is not configured in settings.json`);
+                failedModels.push(amdgpus[i].netterDeviceName);
             }
         }
+        return failedModels;
     }
 }

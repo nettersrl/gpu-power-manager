@@ -7,4 +7,5 @@ export type GpuInfoObject = si.Systeminformation.GraphicsControllerData & {
     currentPciLinkWidth: string;
     maxPciLinkSpeed: string;
     maxPciLinkWidth: string;
+    currentPowerProfile: string;
 };
